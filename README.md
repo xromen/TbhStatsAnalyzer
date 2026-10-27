@@ -2,6 +2,10 @@
 
 Приложение C# / WPF для Windows x64. Подключается к запущенной TaskBarHero, читает текущие параметры и собирает фактические события изменения здоровья. Сохранения, характеристики и предметы игры не изменяет.
 
+![Главное окно TbhStatsAnalyzer](docs/screenshots/main-window.jpg)
+
+*Главное окно до подключения к игре.*
+
 ## Запуск
 
 Готовая сборка после выполнения `build.ps1` находится в `artifacts/TbhStatsAnalyzer/TbhStatsAnalyzer.exe`. Сохраняйте рядом все файлы этой папки, в частности `TbhObserver.payload.dll`. Нужен .NET Desktop Runtime 8 x64.
