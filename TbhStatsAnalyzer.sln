@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TbhStatsAnalyzer", "src\TbhStatsAnalyzer\TbhStatsAnalyzer.csproj", "{B32FC00F-A7EE-46FA-8117-8CECA6B915B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TbhStatsAnalyzer.Checks", "tests\TbhStatsAnalyzer.Checks\TbhStatsAnalyzer.Checks.csproj", "{5735A137-60B0-4A8C-A8EC-8053B536A26D}"
+EndProject
+Global
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug|Any CPU = Debug|Any CPU
+        Release|Any CPU = Release|Any CPU
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {B32FC00F-A7EE-46FA-8117-8CECA6B915B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {B32FC00F-A7EE-46FA-8117-8CECA6B915B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {B32FC00F-A7EE-46FA-8117-8CECA6B915B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {B32FC00F-A7EE-46FA-8117-8CECA6B915B8}.Release|Any CPU.Build.0 = Release|Any CPU
+        {5735A137-60B0-4A8C-A8EC-8053B536A26D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {5735A137-60B0-4A8C-A8EC-8053B536A26D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {5735A137-60B0-4A8C-A8EC-8053B536A26D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {5735A137-60B0-4A8C-A8EC-8053B536A26D}.Release|Any CPU.Build.0 = Release|Any CPU
+    EndGlobalSection
+EndGlobal

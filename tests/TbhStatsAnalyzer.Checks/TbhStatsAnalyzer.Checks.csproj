@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/TbhStatsAnalyzer/TbhStatsAnalyzer.csproj" />
+    <None Include="../../native/build/TbhObserver.dll" Link="TbhObserver.payload.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

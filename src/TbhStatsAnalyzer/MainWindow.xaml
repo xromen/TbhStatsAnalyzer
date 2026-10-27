@@ -1,0 +1,158 @@
+<Window x:Class="TbhStatsAnalyzer.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:TbhStatsAnalyzer"
+        Title="TbhStatsAnalyzer · Анализатор билда" Background="#0B1320" Foreground="#E7F0FA" FontFamily="Segoe UI" Width="1480" Height="920" MinWidth="1000" MinHeight="650" WindowStartupLocation="CenterScreen" Loaded="WindowLoaded" Closing="WindowClosing">
+  <Grid Margin="24,20">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <DockPanel Margin="0,0,0,18">
+      <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right"><TextBlock x:Name="ConnectionLabel" Text="ОЖИДАНИЕ ПОДКЛЮЧЕНИЯ" Foreground="{StaticResource Accent}" FontWeight="SemiBold" FontSize="12"/><TextBlock x:Name="MapLabel" Text="Запустите TaskbarHero и подключитесь к игре" Foreground="{StaticResource Muted}" Margin="0,5,0,0"/></StackPanel>
+      <StackPanel><TextBlock Text="TASKBARHERO" FontSize="12" FontWeight="Bold" Foreground="{StaticResource Accent}"/><TextBlock Text="Анализатор билда" FontSize="28" FontWeight="SemiBold" Margin="0,2,0,0"/></StackPanel>
+    </DockPanel>
+    <Border Grid.Row="1" Background="{StaticResource Surface}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+      <DockPanel><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="ResetButton" Content="Новый замер" Click="ResetClick" IsEnabled="False" ToolTip="Обнулить только статистику анализатора"/><Button x:Name="ExportButton" Content="Экспорт CSV" Click="ExportClick" IsEnabled="False" ToolTip="Сохранить полный замер, включая строки, скрытые фильтрами"/></StackPanel>
+        <StackPanel Orientation="Horizontal"><ComboBox x:Name="ProcessPicker" AutomationProperties.Name="Процесс игры" DisplayMemberPath="Label" Width="210"/><Button Content="Обновить" Click="RefreshClick"/><Button x:Name="ConnectButton" Content="Подключиться" Click="ConnectClick" Background="#297C69"/><TextBlock x:Name="TimerLabel" Text="Замер 00:00" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="20,0,0,0"/></StackPanel>
+      </DockPanel>
+    </Border>
+    <UniformGrid Grid.Row="2" Columns="4" Margin="-5,0,-5,18">
+      <Border Background="{StaticResource Surface}" CornerRadius="8" Margin="5" Padding="18,14"><StackPanel><TextBlock Text="DPS · ПОСЛЕДНЯЯ СЕКУНДА" Foreground="{StaticResource Muted}" FontSize="11"/><TextBlock x:Name="DpsLabel" Text="—" FontSize="32" Foreground="{StaticResource Accent}" FontWeight="SemiBold"/><TextBlock x:Name="AverageLabel" Text="Средний DPS: —" Foreground="{StaticResource Muted}"/></StackPanel></Border>
+      <Border Background="{StaticResource Surface}" CornerRadius="8" Margin="5" Padding="18,14"><StackPanel><TextBlock Text="НАНЕСЕНО КОМАНДОЙ" Foreground="{StaticResource Muted}" FontSize="11"/><TextBlock x:Name="DamageLabel" Text="—" FontSize="32" FontWeight="SemiBold"/><TextBlock x:Name="HitsLabel" Text="Попаданий: 0" Foreground="{StaticResource Muted}"/></StackPanel></Border>
+      <Border Background="{StaticResource Surface}" CornerRadius="8" Margin="5" Padding="18,14"><StackPanel><TextBlock Text="ПОЛУЧЕНО КОМАНДОЙ" Foreground="{StaticResource Muted}" FontSize="11"/><TextBlock x:Name="TakenLabel" Text="—" FontSize="32" Foreground="#FFA98D" FontWeight="SemiBold"/><TextBlock x:Name="TakenDpsLabel" Text="Входящий DPS: —" Foreground="{StaticResource Muted}"/></StackPanel></Border>
+      <Border Background="{StaticResource Surface}" CornerRadius="8" Margin="5" Padding="18,14"><StackPanel><TextBlock Text="ВОССТАНОВЛЕНО HP КОМАНДЕ" Foreground="{StaticResource Muted}" FontSize="11"/><TextBlock x:Name="HealingLabel" Text="—" FontSize="32" Foreground="#8CBFFF" FontWeight="SemiBold"/><TextBlock x:Name="EnemiesLabel" Text="Врагов на карте: —" Foreground="{StaticResource Muted}"/></StackPanel></Border>
+    </UniformGrid>
+    <TabControl Grid.Row="3" x:Name="Tabs">
+      <TabItem Header="Команда">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="190"/></Grid.RowDefinitions>
+          <local:FilterableDataGrid x:Name="HeroesGrid" SelectionChanged="UnitSelectionChanged" AutomationProperties.Name="Характеристики команды">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Персонаж" Binding="{Binding Name}" Width="145"/>
+              <DataGridTextColumn Header="Здоровье" Binding="{Binding Health}" Width="150"/>
+              <DataGridTextColumn Header="Урон атаки" Binding="{Binding Attack, StringFormat=N1}" Width="100"/>
+              <DataGridTextColumn Header="DPS / 1 с" Binding="{Binding Dps, StringFormat=N1}" Width="105"/>
+              <DataGridTextColumn Header="DPS / средний" Binding="{Binding AverageDps, StringFormat=N1}" Width="115"/>
+              <DataGridTextColumn Header="Нанесено" Binding="{Binding Damage, StringFormat=N1}" Width="105"/>
+              <DataGridTextColumn Header="Получено" Binding="{Binding Taken, StringFormat=N1}" Width="105"/>
+              <DataGridTextColumn Header="Защита" Binding="{Binding Armor, StringFormat=N1}" Width="85"/>
+              <DataGridTextColumn Header="Огонь %" Binding="{Binding Fire, StringFormat=N1}" Width="85"/>
+              <DataGridTextColumn Header="Холод %" Binding="{Binding Cold, StringFormat=N1}" Width="85"/>
+              <DataGridTextColumn Header="Молния %" Binding="{Binding Lightning, StringFormat=N1}" Width="90"/>
+              <DataGridTextColumn Header="Хаос %" Binding="{Binding Chaos, StringFormat=N1}" Width="85"/>
+              <DataGridTextColumn Header="Скор. атаки" Binding="{Binding AttackSpeed, StringFormat=N2}" Width="100"/>
+              <DataGridTextColumn Header="Крит %" Binding="{Binding CritChance, StringFormat=N1}" Width="85"/>
+              <DataGridTextColumn Header="Лечение" Binding="{Binding Healing, StringFormat=N1}" Width="100"/>
+            </DataGrid.Columns>
+          </local:FilterableDataGrid>
+          <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
+          <Grid Grid.Row="2" Margin="0,10,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <StackPanel Margin="12,8,16,0"><TextBlock x:Name="HeroDetailTitle" Text="Все характеристики" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Выберите персонажа. Здесь показаны все 81 параметр из текущего кэша игры, включая регенерацию, блок, уклонение и бонусы урона." TextWrapping="Wrap" Foreground="{StaticResource Muted}" Margin="0,8,0,0"/></StackPanel>
+            <local:FilterableDataGrid Grid.Column="1" x:Name="HeroStatsGrid"><DataGrid.Columns><DataGridTextColumn Header="Параметр" Binding="{Binding Name}" Width="*"/><DataGridTextColumn Header="Значение игры" Binding="{Binding Value, StringFormat=N3}" Width="150"/></DataGrid.Columns></local:FilterableDataGrid>
+          </Grid>
+        </Grid>
+      </TabItem>
+      <TabItem Header="Урон и стихии">
+        <DockPanel><StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,12"><TextBlock Text="Направление" VerticalAlignment="Center" Foreground="{StaticResource Muted}" Margin="0,0,10,0"/><ComboBox x:Name="DirectionPicker" SelectionChanged="FilterChanged" Width="230"><ComboBoxItem Content="Нанесено героями" IsSelected="True"/><ComboBoxItem Content="Получено героями"/><ComboBoxItem Content="Нанесено врагами"/><ComboBoxItem Content="Все направления"/></ComboBox><TextBlock Text="Счётчик после защиты · HP отдельно учитывает добивания" VerticalAlignment="Center" Foreground="{StaticResource Muted}" Margin="16,0,0,0"/></StackPanel>
+          <local:FilterableDataGrid x:Name="BreakdownGrid" AutomationProperties.Name="Разбивка урона по стихиям"><DataGrid.Columns>
+            <DataGridTextColumn Header="Персонаж / враг" Binding="{Binding Actor}" Width="150"/><DataGridTextColumn Header="Направление" Binding="{Binding Direction}" Width="165"/>
+            <DataGridTextColumn Header="Стихия" Binding="{Binding Element}" Width="110"/><DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="125"/><DataGridTextColumn Header="Источник" Binding="{Binding Source}" Width="135"/>
+            <DataGridTextColumn Header="Урон" Binding="{Binding Damage, StringFormat=N1}" Width="100"/><DataGridTextColumn Header="Потеря HP" Binding="{Binding HpLost, StringFormat=N1}" Width="100"/>
+            <DataGridTextColumn Header="Избыток" Binding="{Binding Overkill, StringFormat=N1}" Width="95"/><DataGridTextColumn Header="DPS / 1 с" Binding="{Binding Dps, StringFormat=N1}" Width="100"/><DataGridTextColumn Header="DPS / ср." Binding="{Binding AverageDps, StringFormat=N1}" Width="100"/>
+            <DataGridTextColumn Header="Удары" Binding="{Binding Hits}" Width="75"/><DataGridTextColumn Header="Криты %" Binding="{Binding CritPercent, StringFormat=N1}" Width="85"/><DataGridTextColumn Header="Доля %" Binding="{Binding Share, StringFormat=N1}" Width="85"/>
+          </DataGrid.Columns></local:FilterableDataGrid>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="Враги на карте">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="190"/></Grid.RowDefinitions>
+          <local:FilterableDataGrid x:Name="EnemiesGrid" SelectionChanged="UnitSelectionChanged" AutomationProperties.Name="Враги текущей карты"><DataGrid.Columns>
+            <DataGridTextColumn Header="Враг" Binding="{Binding Name}" Width="190"/><DataGridTextColumn Header="Здоровье" Binding="{Binding Health}" Width="170"/>
+            <DataGridTextColumn Header="Урон атаки" Binding="{Binding Attack, StringFormat=N1}" Width="110"/><DataGridTextColumn Header="Защита" Binding="{Binding Armor, StringFormat=N1}" Width="100"/>
+            <DataGridTextColumn Header="Огонь %" Binding="{Binding Fire, StringFormat=N1}" Width="95"/><DataGridTextColumn Header="Холод %" Binding="{Binding Cold, StringFormat=N1}" Width="95"/>
+            <DataGridTextColumn Header="Молния %" Binding="{Binding Lightning, StringFormat=N1}" Width="100"/><DataGridTextColumn Header="Хаос %" Binding="{Binding Chaos, StringFormat=N1}" Width="95"/>
+            <DataGridTextColumn Header="Нанёс" Binding="{Binding Damage, StringFormat=N1}" Width="110"/><DataGridTextColumn Header="Получил" Binding="{Binding Taken, StringFormat=N1}" Width="110"/><DataGridTextColumn Header="Входящий DPS" Binding="{Binding TakenDps, StringFormat=N1}" Width="120"/>
+          </DataGrid.Columns></local:FilterableDataGrid>
+          <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
+          <Grid Grid.Row="2" Margin="0,10,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><StackPanel Margin="12,8,16,0"><TextBlock x:Name="EnemyDetailTitle" Text="Параметры врага" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Живые враги текущей волны, включая призванных. Выберите строку, чтобы увидеть все характеристики." TextWrapping="Wrap" Foreground="{StaticResource Muted}" Margin="0,8,0,0"/></StackPanel><local:FilterableDataGrid Grid.Column="1" x:Name="EnemyStatsGrid"><DataGrid.Columns><DataGridTextColumn Header="Параметр" Binding="{Binding Name}" Width="*"/><DataGridTextColumn Header="Значение игры" Binding="{Binding Value, StringFormat=N3}" Width="150"/></DataGrid.Columns></local:FilterableDataGrid></Grid>
+        </Grid>
+      </TabItem>
+      <TabItem Header="Журнал попаданий">
+        <DockPanel><TextBlock DockPanel.Dock="Top" Text="Последние 1000 событий. Полный итог замера сохраняется в счётчиках. Новые события сверху." Foreground="{StaticResource Muted}" Margin="10,0,0,12"/>
+          <local:FilterableDataGrid x:Name="EventsGrid" AutomationProperties.Name="Журнал боевых событий"><DataGrid.Columns>
+            <DataGridTextColumn Header="#" Binding="{Binding Sequence}" Width="75"/><DataGridTextColumn Header="Событие" Binding="{Binding EventKindLabel}" Width="95"/><DataGridTextColumn Header="Атакующий" Binding="{Binding Attacker}" Width="140"/><DataGridTextColumn Header="Цель" Binding="{Binding Target}" Width="140"/>
+            <DataGridTextColumn Header="До защиты *" Binding="{Binding OriginDamage, StringFormat=N1}" Width="110"/><DataGridTextColumn Header="Урон" Binding="{Binding Damage, StringFormat=N1}" Width="95"/><DataGridTextColumn Header="Потеря HP" Binding="{Binding HpLost, StringFormat=N1}" Width="100"/>
+            <DataGridTextColumn Header="Лечение" Binding="{Binding Healing, StringFormat=N1}" Width="95"/><DataGridTextColumn Header="Стихия" Binding="{Binding ElementName}" Width="110"/><DataGridTextColumn Header="Тип" Binding="{Binding TypeName}" Width="125"/>
+            <DataGridTextColumn Header="Источник" Binding="{Binding SourceName}" Width="140"/><DataGridTextColumn Header="Крит" Binding="{Binding CritLabel}" Width="65"/><DataGridTextColumn Header="Атака" Binding="{Binding BasicLabel}" Width="125"/><DataGridTextColumn Header="Перераспр." Binding="{Binding RedirectLabel}" Width="95"/>
+          </DataGrid.Columns></local:FilterableDataGrid>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="Смерти">
+        <Grid>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="2*" MinHeight="120"/><RowDefinition Height="5"/><RowDefinition Height="Auto"/><RowDefinition Height="3*" MinHeight="150"/></Grid.RowDefinitions>
+          <TextBlock Text="Подтверждённые смерти героев. Выберите смерть для разбора последних 10 секунд этой жизни. История относится к текущему замеру." Foreground="{StaticResource Muted}" Margin="10,0,10,12" TextWrapping="Wrap"/>
+          <local:FilterableDataGrid Grid.Row="1" x:Name="DeathsGrid" SelectionChanged="DeathSelectionChanged" AutomationProperties.Name="История смертей персонажей">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Время замера" Binding="{Binding TimeLabel}" Width="125"/>
+              <DataGridTextColumn Header="Персонаж" Binding="{Binding Hero}" Width="130"/>
+              <DataGridTextColumn Header="Кто добил" Binding="{Binding Killer}" Width="180"/>
+              <DataGridTextColumn Header="Причина" Binding="{Binding Cause}" Width="310"/>
+              <DataGridTextColumn Header="Последний удар" Binding="{Binding FatalDamage, StringFormat=N1}" Width="125"/>
+              <DataGridTextColumn Header="HP до удара" Binding="{Binding HpBeforeFatalHit, StringFormat=N1}" Width="110"/>
+              <DataGridTextColumn Header="Урон за 10 с" Binding="{Binding Damage, StringFormat=N1}" Width="115"/>
+              <DataGridTextColumn Header="Потеря HP" Binding="{Binding HpLost, StringFormat=N1}" Width="110"/>
+              <DataGridTextColumn Header="Данные" Binding="{Binding Completeness}" Width="150"/>
+            </DataGrid.Columns>
+          </local:FilterableDataGrid>
+          <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"/>
+          <StackPanel Grid.Row="3" Margin="12,12,12,10">
+            <TextBlock x:Name="DeathDetailTitle" Text="Смерти пока не зарегистрированы" FontSize="17" FontWeight="SemiBold"/>
+            <TextBlock x:Name="DeathSummaryLabel" Text="Будут показаны атакующий, стихия, тип, крит и HP перед смертельным ударом. Смерти до подключения к игре восстановить нельзя." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+            <TextBlock x:Name="DeathCompletenessLabel" Foreground="#FFA98D" TextWrapping="Wrap" Margin="0,4,0,0"/>
+          </StackPanel>
+          <TabControl Grid.Row="4">
+            <TabItem Header="Урон перед смертью">
+              <local:FilterableDataGrid x:Name="DeathDamageGrid" AutomationProperties.Name="Причины урона перед смертью"><DataGrid.Columns>
+                <DataGridTextColumn Header="Атакующий" Binding="{Binding Attacker}" Width="185"/>
+                <DataGridTextColumn Header="Стихия" Binding="{Binding Element}" Width="115"/>
+                <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="140"/>
+                <DataGridTextColumn Header="Источник" Binding="{Binding Source}" Width="150"/>
+                <DataGridTextColumn Header="Урон" Binding="{Binding Damage, StringFormat=N1}" Width="120"/>
+                <DataGridTextColumn Header="Потеря HP" Binding="{Binding HpLost, StringFormat=N1}" Width="120"/>
+                <DataGridTextColumn Header="Попадания" Binding="{Binding Hits}" Width="100"/>
+                <DataGridTextColumn Header="Криты" Binding="{Binding Crits}" Width="85"/>
+                <DataGridTextColumn Header="Доля %" Binding="{Binding Share, StringFormat=N1}" Width="100"/>
+              </DataGrid.Columns></local:FilterableDataGrid>
+            </TabItem>
+            <TabItem Header="Последовательность попаданий">
+              <local:FilterableDataGrid x:Name="DeathTimelineGrid" AutomationProperties.Name="Попадания и лечение перед смертью"><DataGrid.Columns>
+                <DataGridTextColumn Header="За, секунд" Binding="{Binding SecondsBeforeDeath, StringFormat=N3}" Width="95"/>
+                <DataGridTextColumn Header="Событие" Binding="{Binding Hit.EventKindLabel}" Width="95"/>
+                <DataGridTextColumn Header="Атакующий" Binding="{Binding Hit.Attacker}" Width="180"/>
+                <DataGridTextColumn Header="Стихия" Binding="{Binding Hit.ElementName}" Width="110"/>
+                <DataGridTextColumn Header="Тип" Binding="{Binding Hit.TypeName}" Width="130"/>
+                <DataGridTextColumn Header="Источник" Binding="{Binding Hit.SourceName}" Width="140"/>
+                <DataGridTextColumn Header="Урон" Binding="{Binding Hit.Damage, StringFormat=N1}" Width="105"/>
+                <DataGridTextColumn Header="Потеря HP" Binding="{Binding Hit.HpLost, StringFormat=N1}" Width="105"/>
+                <DataGridTextColumn Header="Лечение" Binding="{Binding Hit.Healing, StringFormat=N1}" Width="100"/>
+                <DataGridTextColumn Header="HP до" Binding="{Binding Hit.HpBefore, StringFormat=N1}" Width="95"/>
+                <DataGridTextColumn Header="HP после" Binding="{Binding Hit.HpAfter, StringFormat=N1}" Width="100"/>
+                <DataGridTextColumn Header="Крит" Binding="{Binding Hit.CritLabel}" Width="65"/>
+                <DataGridTextColumn Header="Итог" Binding="{Binding FatalLabel}" Width="120"/>
+              </DataGrid.Columns></local:FilterableDataGrid>
+            </TabItem>
+          </TabControl>
+        </Grid>
+      </TabItem>
+      <TabItem Header="Как читать показатели">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="24" MaxWidth="900" HorizontalAlignment="Left">
+          <TextBlock Text="Замер реального боя" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+          <TextBlock Text="DPS / 1 с — сумма урона за скользящую последнюю секунду реального времени. Средний DPS — весь урон, разделённый на время с начала замера, включая паузы и перерывы между волнами. При смене карты замер сбрасывается автоматически; кнопка «Новый замер» начинает сравнение заново." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="Урон берётся из окончательного изменения здоровья, после брони, сопротивлений и блокирования. «Потеря HP» ограничена здоровьем цели перед ударом. «Избыток» — разница между уроном удара и фактически снятым HP при добивании. Уклонения и полностью поглощённые атаки без изменения HP в журнал не попадают." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="* «До защиты» — исходное поле OriginDamage из DamageInfo. Оно может ещё не включать критический множитель и другие модификаторы; разницу с итоговым уроном нельзя считать чистым процентом защиты. Стихия и тип помечаются как неизвестные, если игра меняет HP без DamageInfo." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="Основные таблицы используют боевые значения Unit, включая масштабирование картой, модификаторы и предел сопротивлений. В подробностях сначала показаны боевые параметры, затем все 81 исходное значение StatType с префиксом «Кэш». Значения кэша выводятся в единицах игры: шанс крита может быть долей, а сопротивления — процентными пунктами. Блок, уклонение, регенерация и бонусы навыков также доступны в подробностях." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="Сборщик TbhObserver.dll загружается в процесс игры и наблюдает вызовы расчёта урона. Он не записывает HP, предметы или характеристики. При отключении анализатора сбор прекращается. Модуль остаётся загруженным до закрытия игры. После обновления игры проверяется совместимость сигнатур; при несовпадении подключение останавливается." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="CSV содержит итоги по героям, живым врагам, стихиям и последние 1000 событий. Если анализатор не успел забрать события, нижняя строка показывает число потерь: такой замер следует повторить." TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="Поиск классов и сигнатур: IL2CPP.Mcp — takiy_veshi, https://t.me/takiy_veshi. Перехват вызовов: MinHook 1.3.4, Tsuda Kageyu (BSD)." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
+        </StackPanel></ScrollViewer>
+      </TabItem>
+    </TabControl>
+    <DockPanel Grid.Row="4" Margin="2,12,0,0">
+      <Button DockPanel.Dock="Right" Content="Сбросить фильтры" Click="ClearFiltersClick" Padding="12,6" FontSize="12" ToolTip="Показать все записи во всех таблицах"/>
+      <TextBlock x:Name="StatusLabel" Text="Нет данных · подключитесь к запущенной игре" Foreground="{StaticResource Muted}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+    </DockPanel>
+  </Grid>
+</Window>
