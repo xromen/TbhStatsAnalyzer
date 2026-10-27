@@ -8,8 +8,11 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>TbhStatsAnalyzer</AssemblyName>
     <RootNamespace>TbhStatsAnalyzer</RootNamespace>
+    <ApplicationIcon>Assets/app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Assets/app.ico" />
+    <Resource Include="Assets/app-icon.png" />
     <None Include="../../native/build/TbhObserver.dll" Link="TbhObserver.payload.dll" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

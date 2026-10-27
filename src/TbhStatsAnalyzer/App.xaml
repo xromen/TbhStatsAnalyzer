@@ -3,16 +3,62 @@
     <SolidColorBrush x:Key="Surface" Color="#152132"/>
     <SolidColorBrush x:Key="Muted" Color="#94A9BF"/>
     <SolidColorBrush x:Key="Accent" Color="#50DDB5"/>
+    <Style x:Key="ScrollPageButton" TargetType="RepeatButton">
+      <Setter Property="Focusable" Value="False"/><Setter Property="IsTabStop" Value="False"/><Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RepeatButton"><Border Background="{TemplateBinding Background}"/></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="ScrollThumb" TargetType="Thumb">
+      <Setter Property="Background" Value="#314B65"/><Setter Property="MinHeight" Value="24"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Thumb"><Border Background="{TemplateBinding Background}" CornerRadius="5" Margin="3"/></ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#50DDB5"/></Trigger>
+        <Trigger Property="IsDragging" Value="True"><Setter Property="Background" Value="#7BE9CB"/></Trigger>
+        <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource AncestorType=ScrollBar}}" Value="Horizontal"><Setter Property="MinHeight" Value="0"/><Setter Property="MinWidth" Value="24"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="14"/><Setter Property="Background" Value="#0B1320"/><Setter Property="Focusable" Value="False"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar">
+        <Border Background="{TemplateBinding Background}">
+          <Track x:Name="PART_Track" Orientation="{TemplateBinding Orientation}" IsDirectionReversed="True" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" ViewportSize="{TemplateBinding ViewportSize}" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+            <Track.DecreaseRepeatButton><RepeatButton x:Name="PageBefore" Style="{StaticResource ScrollPageButton}" Command="{x:Static ScrollBar.PageUpCommand}"/></Track.DecreaseRepeatButton>
+            <Track.Thumb><Thumb Style="{StaticResource ScrollThumb}"/></Track.Thumb>
+            <Track.IncreaseRepeatButton><RepeatButton x:Name="PageAfter" Style="{StaticResource ScrollPageButton}" Command="{x:Static ScrollBar.PageDownCommand}"/></Track.IncreaseRepeatButton>
+          </Track>
+        </Border>
+        <ControlTemplate.Triggers><Trigger Property="Orientation" Value="Horizontal">
+          <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False"/>
+          <Setter TargetName="PageBefore" Property="Command" Value="{x:Static ScrollBar.PageLeftCommand}"/>
+          <Setter TargetName="PageAfter" Property="Command" Value="{x:Static ScrollBar.PageRightCommand}"/>
+        </Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers>
+        <Trigger Property="Orientation" Value="Horizontal"><Setter Property="Width" Value="Auto"/><Setter Property="Height" Value="14"/></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4"/></Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style TargetType="ScrollViewer"><Style.Resources><SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#101B2A"/></Style.Resources></Style>
     <Style TargetType="Window"><Setter Property="Background" Value="#0B1320"/><Setter Property="Foreground" Value="#E7F0FA"/><Setter Property="FontFamily" Value="Segoe UI"/></Style>
     <Style TargetType="Button">
       <Setter Property="Foreground" Value="#E7F0FA"/><Setter Property="Background" Value="#24364C"/><Setter Property="BorderThickness" Value="0"/>
       <Setter Property="Padding" Value="15,9"/><Setter Property="Margin" Value="4,0"/><Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border x:Name="Border" CornerRadius="6" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Border" Property="Opacity" Value="0.8"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter TargetName="Border" Property="Opacity" Value="0.4"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Border" Property="BorderBrush" Value="#50DDB5"/><Setter TargetName="Border" Property="BorderThickness" Value="2"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
     </Style>
+    <Style x:Key="CaptionButton" TargetType="Button">
+      <Setter Property="Width" Value="46"/><Setter Property="Height" Value="44"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0"/>
+      <Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="#AFC3D8"/><Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#24364C"/><Setter Property="Foreground" Value="White"/></Trigger>
+        <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="#334B65"/></Trigger>
+        <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="#50DDB5"/><Setter Property="BorderThickness" Value="1"/></Trigger>
+      </Style.Triggers>
+    </Style>
     <Style TargetType="ComboBox"><Setter Property="Padding" Value="8,7"/><Setter Property="MinWidth" Value="160"/><Setter Property="Foreground" Value="#142234"/></Style>
     <Style TargetType="TabControl"><Setter Property="Background" Value="#101B2A"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="0,12,0,0"/></Style>
     <Style TargetType="TabItem"><Setter Property="Foreground" Value="#9AAFC7"/><Setter Property="FontSize" Value="14"/><Setter Property="Padding" Value="18,12"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem"><Border x:Name="Tab" Background="#152132" CornerRadius="6,6,0,0" Padding="{TemplateBinding Padding}" Margin="0,0,6,0"><ContentPresenter ContentSource="Header"/></Border><ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#50DDB5"/><Setter TargetName="Tab" Property="Background" Value="#20364A"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style>
     <Style TargetType="DataGrid">
+      <Style.Resources><SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#101B2A"/></Style.Resources>
       <Setter Property="Background" Value="#101B2A"/><Setter Property="Foreground" Value="#E7F0FA"/><Setter Property="RowBackground" Value="#101B2A"/><Setter Property="AlternatingRowBackground" Value="#142132"/>
       <Setter Property="BorderThickness" Value="0"/><Setter Property="GridLinesVisibility" Value="Horizontal"/><Setter Property="HorizontalGridLinesBrush" Value="#203044"/>
       <Setter Property="AutoGenerateColumns" Value="False"/><Setter Property="IsReadOnly" Value="True"/><Setter Property="CanUserAddRows" Value="False"/><Setter Property="CanUserDeleteRows" Value="False"/>

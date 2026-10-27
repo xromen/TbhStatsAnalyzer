@@ -3,8 +3,10 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shell;
 using TbhStatsAnalyzer;
 
 internal static class UiChecks
@@ -26,10 +28,20 @@ internal static class UiChecks
     private static void RenderDeathTab(bool filters)
     {
         var app = new App(); app.InitializeComponent();
+        CheckScrollbar(app, Orientation.Vertical); CheckScrollbar(app, Orientation.Horizontal);
         var errors = new StringWriter();
         var trace = new TextWriterTraceListener(errors) { Filter = new EventTypeFilter(SourceLevels.Error) };
         PresentationTraceSources.DataBindingSource.Listeners.Add(trace);
         var window = new MainWindow();
+        var chrome = WindowChrome.GetWindowChrome(window);
+        if (chrome is not { CaptionHeight: 44, UseAeroCaptionButtons: false } || window.Icon is null)
+            throw new Exception("Custom title bar or window icon is missing");
+        var icon = BitmapDecoder.Create(new Uri("pack://application:,,,/TbhStatsAnalyzer;component/Assets/app.ico"), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+        if (!new[] { 16, 20, 24, 32, 40, 48, 64, 128, 256 }.All(size => icon.Frames.Any(frame => frame.PixelWidth == size && frame.PixelHeight == size)))
+            throw new Exception("Application icon must contain all taskbar and title bar sizes");
+        if (((Image)window.FindName("TitleIcon")).Source is not BitmapSource { PixelWidth: 256 } ||
+            new[] { "MinimizeButton", "MaximizeButton", "CloseButton" }.Any(name => window.FindName(name) is not Button))
+            throw new Exception("Title bar icon or window controls are missing");
         var meter = (CombatMeter)typeof(MainWindow).GetField("meter", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
         meter.Reset(new Snapshot { Ready = true, TimeMs = 1000, StageKey = 1 });
         var snapshot = new Snapshot
@@ -73,5 +85,20 @@ internal static class UiChecks
         trace.Flush();
         if (!string.IsNullOrWhiteSpace(errors.ToString())) throw new Exception(errors.ToString());
         PresentationTraceSources.DataBindingSource.Listeners.Remove(trace);
+    }
+    private static void CheckScrollbar(App app, Orientation orientation)
+    {
+        var bar = new ScrollBar { Orientation = orientation, Minimum = 0, Maximum = 100, ViewportSize = 20, Value = 25,
+            Style = (Style)app.FindResource(typeof(ScrollBar)) };
+        var size = orientation == Orientation.Vertical ? new Size(14, 200) : new Size(200, 14);
+        bar.Measure(size); bar.Arrange(new Rect(size)); bar.UpdateLayout();
+        var track = (Track)bar.Template.FindName("PART_Track", bar);
+        if (track is null || track.IsDirectionReversed != (orientation == Orientation.Vertical) || track.Thumb.Style != app.FindResource("ScrollThumb"))
+            throw new Exception($"{orientation} scrollbar template is incorrect");
+        track.Value = 50;
+        if (bar.Value != 50) throw new Exception("Dragging the scrollbar thumb must update the scroll value");
+        if (track.DecreaseRepeatButton.Command != (orientation == Orientation.Vertical ? ScrollBar.PageUpCommand : ScrollBar.PageLeftCommand) ||
+            track.IncreaseRepeatButton.Command != (orientation == Orientation.Vertical ? ScrollBar.PageDownCommand : ScrollBar.PageRightCommand))
+            throw new Exception("Scrollbar page commands do not match its orientation");
     }
 }

@@ -27,4 +27,7 @@ New-Item -ItemType Directory -Path $taskOutput -Force | Out-Null
 Copy-Item -Path 'src\TbhStatsAnalyzer\bin\Release\net8.0-windows\*' -Exclude 'TbhObserver.dll','observer' -Destination $taskOutput -Recurse -Force
 Copy-Item -LiteralPath 'native\vendor\minhook\LICENSE.txt' -Destination (Join-Path $taskOutput 'MinHook-LICENSE.txt') -Force
 Copy-Item -LiteralPath 'README.md' -Destination $taskOutput -Force
+$taskScreenshots = Join-Path $taskOutput 'docs\screenshots'
+New-Item -ItemType Directory -Path $taskScreenshots -Force | Out-Null
+Copy-Item -LiteralPath 'docs\screenshots\main-window.png' -Destination $taskScreenshots -Force
 Write-Host "Готово: $taskOutput\TbhStatsAnalyzer.exe"

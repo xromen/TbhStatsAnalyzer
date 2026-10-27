@@ -26,6 +26,13 @@ public partial class MainWindow : Window
         timer.Tick += Poll;
     }
     private void WindowLoaded(object sender, RoutedEventArgs e) => RefreshGames();
+    private void MinimizeClick(object sender, RoutedEventArgs e) => SystemCommands.MinimizeWindow(this);
+    private void ToggleMaximizeClick(object sender, RoutedEventArgs e)
+    {
+        if (WindowState == WindowState.Maximized) SystemCommands.RestoreWindow(this);
+        else SystemCommands.MaximizeWindow(this);
+    }
+    private void CloseClick(object sender, RoutedEventArgs e) => SystemCommands.CloseWindow(this);
     private void RefreshClick(object sender, RoutedEventArgs e) => RefreshGames();
     private void RefreshGames()
     {
